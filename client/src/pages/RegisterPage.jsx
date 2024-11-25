@@ -1,16 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import '../styles/Register.scss'
+import { useNavigate } from 'react-router-dom'
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '', profileImage: null })
     const [passwordMatch, setPasswordMatch] = useState(true)
+    const navigate = useNavigate()
     const handleChange = e => {
         const { name, value, files } = e.target
         setFormData({ ...formData, [name]: name === 'profileImage' ? files[0] : value })
     }
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(formData)
+        try {
+            const register_form = new FormData()
+            for (var key in formData) {
+                register_form.append(key, formData[key])
+            }
+            const response = await fetch('http://localhost:5000/api/auth/register', { method: 'POST', body: register_form })
+            if (response.ok) {
+                navigate('/login')
+            }
+        } catch (error) {
+            console.log("registration failed " + error.message)
+        }
     }
     useEffect(() => setPasswordMatch(formData.password === formData.confirmPassword || formData.confirmPassword === ""))
     return (

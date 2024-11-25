@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
 const userModel = require("../models/userModel")
+const jwt = require('jsonwebtoken')
 
 //registration
 const registration = async (req, res) => {
@@ -24,10 +25,26 @@ const registration = async (req, res) => {
             profileImagePath
         })
         await newUser.save()
-        return res.status(200).json({ message: 'Registartion successfully', user: newUser })
+        return res.status(201).json({ message: 'Registartion successfully', user: newUser })
     } catch (error) {
         return res.status(500).json({ message: 'Registration failed', error: error.message })
     }
 }
 
-module.exports = { registration }
+//login
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        const userExist = await userModel.findOne({ email })
+        if (!userExist) {
+            return res.status(409).json({ message: 'User does not exist' })
+        }
+        const isMatch = bcrypt.compare(password, userExist.password)
+        if (!isMatch) { return res.status(409).json({ message: 'Invalid credentials' }) }
+        const token = jwt.sign({ id: userExist._id }, process.env.JWT_SECRET)
+        return res.status(200).json({ messaeg: 'Login successfully', user: userExist, token })
+    } catch (error) {
+        return res.status(500).json({ message: 'Login failed', error: error.message })
+    }
+}
+module.exports = { registration, login }

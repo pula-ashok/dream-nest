@@ -70,7 +70,7 @@
     }
     &_accountmenu {
       position: absolute;
-      //   background-color: white;
+      background-color: white;
       top: 80px;
       right: 60px;
       display: flex;
@@ -80,7 +80,7 @@
       padding: 10px 0px;
       border-radius: 20px;
       @include shadow;
-      z-index: 99999;
+      z-index: 9999;
       @include sm {
         right: 20px;
       }

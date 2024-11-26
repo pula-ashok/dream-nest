@@ -25,7 +25,8 @@ const registration = async (req, res) => {
             profileImagePath
         })
         await newUser.save()
-        return res.status(201).json({ message: 'Registartion successfully', user: newUser })
+        const { password: as, ...userData } = newUser._doc
+        return res.status(201).json({ message: 'Registartion successfully', user: userData })
     } catch (error) {
         return res.status(500).json({ message: 'Registration failed', error: error.message })
     }
@@ -42,7 +43,8 @@ const login = async (req, res) => {
         const isMatch = bcrypt.compare(password, userExist.password)
         if (!isMatch) { return res.status(409).json({ message: 'Invalid credentials' }) }
         const token = jwt.sign({ id: userExist._id }, process.env.JWT_SECRET)
-        return res.status(200).json({ messaeg: 'Login successfully', user: userExist, token })
+        const { password: as, ...userData } = userExist._doc
+        return res.status(200).json({ messaeg: 'Login successfully', user: userData, token })
     } catch (error) {
         return res.status(500).json({ message: 'Login failed', error: error.message })
     }
